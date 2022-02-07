@@ -38,7 +38,9 @@ import android.content.Context
 import android.view.View
 import android.widget.Toast
 
-
+/**
+ * Helper functions for the View layer of the app.
+ */
 fun View.visible() {
   visibility = View.VISIBLE
 }

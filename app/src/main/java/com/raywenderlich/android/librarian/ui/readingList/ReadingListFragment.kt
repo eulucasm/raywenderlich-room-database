@@ -76,8 +76,6 @@ class ReadingListFragment : Fragment() {
   }
 
   private fun initListeners() {
-    pullToRefresh.isEnabled = false
-
     addReadingList.setOnClickListener {
       showAddReadingListDialog()
     }
@@ -103,6 +101,7 @@ class ReadingListFragment : Fragment() {
 
   private fun removeReadingList(readingList: ReadingListsWithBooks) {
     // TODO remove reading list
+    loadReadingLists()
   }
 
   private fun onItemSelected(readingList: ReadingListsWithBooks) {

@@ -48,50 +48,49 @@ import java.util.*
 
 class AddBookReviewActivity : AppCompatActivity() {
 
-    private val repository by lazy { App.repository }
+  private val repository by lazy { App.repository }
 
-    companion object {
-        fun getIntent(context: Context) = Intent(context, AddBookReviewActivity::class.java)
-    }
+  companion object {
+    fun getIntent(context: Context) = Intent(context, AddBookReviewActivity::class.java)
+  }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_add_book_review)
-        initUi()
-    }
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    setContentView(R.layout.activity_add_book_review)
+    initUi()
+  }
 
-    private fun initUi() {
-        bookOption.adapter = ArrayAdapter(
-            this@AddBookReviewActivity,
-            android.R.layout.simple_spinner_dropdown_item,
-            repository.getBooks().map { it.book.name }
-        )
+  private fun initUi() {
+    bookOption.adapter = ArrayAdapter(
+        this@AddBookReviewActivity,
+        android.R.layout.simple_spinner_dropdown_item,
+        repository.getBooks().map { it.book.name }
+    )
 
-        addReview.setOnClickListener { addBookReview() }
-    }
+    addReview.setOnClickListener { addBookReview() }
+  }
 
+  private fun addBookReview() {
+    val rating = reviewRating.rating.toInt()
+    val bookId = repository.getBooks()
+        .firstOrNull { it.book.name == bookOption.selectedItem }?.book?.id
 
-    private fun addBookReview() {
-        val rating = reviewRating.rating.toInt()
-        val bookId =
-            repository.getBooks().firstOrNull { it.book.nome == bookOption.selectedItem }?.book?.id
+    val imageUrl = bookImageUrl.text.toString()
+    val notes = reviewNotes.text.toString()
 
-        val imageUrl = bookImageUrl.text.toString()
-        val notes = reviewNotes.text.toString()
-
-        if (bookId != null && imageUrl.isNotBlank() && notes.isNotBlank()) {
-            val bookReview = Review(
-                bookId = bookId,
-                rating = rating,
-                notes = notes,
-                imageUrl = imageUrl
+    if (bookId != null && imageUrl.isNotBlank() && notes.isNotBlank()) {
+      val bookReview = Review(
+          bookId = bookId,
+          rating = rating,
+          notes = notes,
+          imageUrl = imageUrl
 //          entries = emptyList(),
 //          lastUpdatedDate = Date()
-            )
+      )
 
-            repository.addReview(bookReview)
-            setResult(Activity.RESULT_OK)
-            finish()
-        }
+      repository.addReview(bookReview)
+      setResult(Activity.RESULT_OK)
+      finish()
     }
+  }
 }

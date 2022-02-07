@@ -74,8 +74,6 @@ class BookReviewsFragment : Fragment() {
   }
 
   private fun initListeners() {
-    pullToRefresh.isEnabled = false
-
     addBookReview.setOnClickListener {
       startActivityForResult(
           AddBookReviewActivity.getIntent(requireContext()), REQUEST_CODE_ADD_REVIEW
@@ -96,6 +94,8 @@ class BookReviewsFragment : Fragment() {
 
   private fun removeReviewFromRepo(item: BookReview) {
     // TODO remove item from DB
+
+    loadBookReviews()
   }
 
   private fun loadBookReviews() {

@@ -51,10 +51,10 @@ class App : Application() {
 
     val repository: LibrarianRepository by lazy {
       LibrarianRepositoryImpl(
-        database.bookDao(),
-        database.genreDao(),
-        database.readingListDao(),
-        database.reviewDao()
+          database.bookDao(),
+          database.genreDao(),
+          database.readingListDao(),
+          database.reviewDao()
       )
     }
   }
@@ -63,24 +63,24 @@ class App : Application() {
     super.onCreate()
     instance = this
 
-    if (repository.getBooks().isEmpty()){
+    if (repository.getGenres().isEmpty()) {
       repository.addGenres(
-        listOf(
-          Genre(name = "Action"),
-          Genre(name = "Adventure"),
-          Genre(name = "Classic"),
-          Genre(name = "Mystery"),
-          Genre(name = "Fantasy"),
-          Genre(name = "Sci-Fi"),
-          Genre(name = "History"),
-          Genre(name = "Horror"),
-          Genre(name = "Romance"),
-          Genre(name = "Short Story"),
-          Genre(name = "Biography"),
-          Genre(name = "Poetry"),
-          Genre(name = "Self-Help"),
-          Genre(name = "Young novel")
-        )
+          listOf(
+              Genre(name = "Action"),
+              Genre(name = "Adventure"),
+              Genre(name = "Classic"),
+              Genre(name = "Mystery"),
+              Genre(name = "Fantasy"),
+              Genre(name = "Sci-Fi"),
+              Genre(name = "History"),
+              Genre(name = "Horror"),
+              Genre(name = "Romance"),
+              Genre(name = "Short Story"),
+              Genre(name = "Biography"),
+              Genre(name = "Poetry"),
+              Genre(name = "Self-Help"),
+              Genre(name = "Young novel")
+          )
       )
     }
   }

@@ -57,7 +57,7 @@ class BooksFragment : Fragment() {
 
   private val adapter by lazy { BookAdapter(::onItemLongTapped) }
   private var filter: Filter? = null
-  private val repository by lazy { App.repository}
+  private val repository by lazy { App.repository }
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
       savedInstanceState: Bundle?): View? {

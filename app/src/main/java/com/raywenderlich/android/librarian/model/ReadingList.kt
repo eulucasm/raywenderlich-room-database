@@ -46,5 +46,5 @@ class ReadingList(
     @PrimaryKey
     val id: String = UUID.randomUUID().toString(),
     val name: String
-    //val bookIds: List<String>
+//    val bookIds: List<String>
 ) : Parcelable
