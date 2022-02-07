@@ -41,6 +41,8 @@ import com.raywenderlich.android.librarian.model.Genre
 import com.raywenderlich.android.librarian.model.ReadingList
 import com.raywenderlich.android.librarian.model.Review
 import com.raywenderlich.android.librarian.model.relations.BookAndGenre
+import com.raywenderlich.android.librarian.model.relations.BookReview
+import com.raywenderlich.android.librarian.model.relations.ReadingListsWithBooks
 
 class LibrarianRepositoryImpl(
     private val bookDao: BookDao,
@@ -49,23 +51,52 @@ class LibrarianRepositoryImpl(
     private val reviewDao: ReviewDao
 ) : LibrarianRepository {
 
-  override fun addBook(book: Book) = bookDao.addBook(book)
+    override fun addBook(book: Book) = bookDao.addBook(book)
 
-  override fun getBooks(): List<BookAndGenre> = bookDao.getBooks().map {
-    BookAndGenre(it, genreDao.getGenreById(it.genreId))
-  }
+    override fun getBooks(): List<BookAndGenre> = bookDao.getBooks()
 
-  override fun removeBook(book: Book) = bookDao.removeBook(book)
+    override fun getBookById(bookId: String): Book = bookDao.getBookById(bookId)
 
-  override fun getGenres(): List<Genre> = genreDao.getGenres()
+    override fun removeBook(book: Book) = bookDao.removeBook(book)
 
-  override fun getGenreById(genreId: String): Genre = genreDao.getGenreById(genreId)
+    override fun getGenres(): List<Genre> = genreDao.getGenres()
 
-  override fun addGenres(genres: List<Genre>) = genreDao.addGenres(genres)
+    override fun getGenreById(genreId: String): Genre = genreDao.getGenreById(genreId)
 
-  override fun addReview(review: Review) = reviewDao.addReview(review)
+    override fun addGenres(genres: List<Genre>) = genreDao.addGenres(genres)
 
-  override fun updateReview(review: Review) = reviewDao.updateReview(review)
+    override fun addReview(review: Review) = reviewDao.addReview(review)
 
-  override fun addReadingList(readingList: ReadingList) = readingListDao.addReadingList(readingList)
+    override fun removeReview(review: Review) = reviewDao.removeReview(review)
+
+    override fun getReviewById(reviewId: String): BookReview= reviewDao.getReviewById(reviewId)
+
+    override fun getReviews(): List<BookReview> = reviewDao.getReviews()
+
+    override fun updateReview(review: Review) = reviewDao.updateReview(review)
+
+    override fun addReadingList(readingList: ReadingList) =
+        readingListDao.addReadingList(readingList)
+
+    override fun getReadingLists(): List<ReadingListsWithBooks> =
+        readingListDao.getReadingLists().map {
+            ReadingListsWithBooks(it.id, it.name, emptyList())
+        }
+
+    override fun removeReadingList(readingList: ReadingList) =
+        readingListDao.removeReadingList(readingList)
+
+    override fun getBooksByGenre(genreId: String): List<BookAndGenre> =
+        genreDao.getBooksByGenre(genreId).let { booksByGenre ->
+            val books = booksByGenre.books ?: return emptyList()
+
+            return books.map { BookAndGenre(it, booksByGenre.genre) }
+        }
+
+    override fun getBooksByRating(rating: Int): List<BookAndGenre> {
+        val reviewsByRating = reviewDao.getReviewsByRating(rating)
+
+        return reviewsByRating.map{ BookAndGenre(it.book, reviewDao.getGenreById(it)) }
+    }
+
 }

@@ -43,8 +43,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.raywenderlich.android.librarian.App
 import com.raywenderlich.android.librarian.R
 import com.raywenderlich.android.librarian.model.Book
-import com.raywenderlich.android.librarian.model.relations.BookAndGenre
 import com.raywenderlich.android.librarian.ui.addBook.AddBookActivity
+import com.raywenderlich.android.librarian.ui.filter.ByGenre
+import com.raywenderlich.android.librarian.ui.filter.ByRating
 import com.raywenderlich.android.librarian.ui.filter.Filter
 import com.raywenderlich.android.librarian.ui.filter.FilterPickerDialogFragment
 import com.raywenderlich.android.librarian.utils.createAndShowDialog
@@ -60,7 +61,7 @@ class BooksFragment : Fragment() {
   private val repository by lazy { App.repository }
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-      savedInstanceState: Bundle?): View? {
+                            savedInstanceState: Bundle?): View? {
     return inflater.inflate(R.layout.fragment_books, container, false)
   }
 
@@ -99,7 +100,11 @@ class BooksFragment : Fragment() {
   private fun loadBooks() {
     pullToRefresh.isRefreshing = true
 
-    val books = repository.getBooks()
+    val books = when (val currentFilter = filter) {
+      is ByGenre -> repository.getBooksByGenre(currentFilter.genreId)
+      is ByRating -> repository.getBooksByRating(currentFilter.rating)
+      else -> repository.getBooks()
+    }
 
     adapter.setData(books)
     pullToRefresh.isRefreshing = false
@@ -114,7 +119,7 @@ class BooksFragment : Fragment() {
   }
 
   private fun removeBook(book: Book) {
-    // TODO remove book
+    repository.removeBook(book)
     loadBooks()
   }
 }

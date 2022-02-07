@@ -32,11 +32,9 @@
  * THE SOFTWARE.
  */package com.raywenderlich.android.librarian.database.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.raywenderlich.android.librarian.model.Genre
+import com.raywenderlich.android.librarian.model.relations.BooksByGenre
 
 @Dao
 interface GenreDao {
@@ -49,4 +47,12 @@ interface GenreDao {
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   fun addGenres(genres: List<Genre>)
+
+  @Transaction
+  @Query("SELECT * FROM genre WHERE id = :genreId")
+  fun getBooksByGenre(genreId: String): BooksByGenre
+
+  @Transaction
+  @Query("SELECT * FROM genre")
+  fun getBooksByGenres(): List<BooksByGenre>
 }
