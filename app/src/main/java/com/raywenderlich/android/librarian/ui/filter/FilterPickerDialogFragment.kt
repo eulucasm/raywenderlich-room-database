@@ -41,18 +41,19 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.ArrayAdapter
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.lifecycleScope
 import com.raywenderlich.android.librarian.App
 import com.raywenderlich.android.librarian.R
-import com.raywenderlich.android.librarian.model.Genre
 import kotlinx.android.synthetic.main.dialog_filter_books.*
+import kotlinx.coroutines.launch
 
 class FilterPickerDialogFragment(private val onFilterSelected: (Filter?) -> Unit)
   : DialogFragment() {
 
-  private val repository by lazy { App.repository}
+  private val repository by lazy { App.repository }
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-      savedInstanceState: Bundle?): View? {
+                            savedInstanceState: Bundle?): View? {
     return inflater.inflate(R.layout.dialog_filter_books, container, false)
   }
 
@@ -66,16 +67,18 @@ class FilterPickerDialogFragment(private val onFilterSelected: (Filter?) -> Unit
       updateOptions(checkedId)
     }
 
-    genrePicker.adapter = ArrayAdapter(
-        requireContext(),
-        android.R.layout.simple_spinner_dropdown_item,
-        repository.getGenres().map { it.name }
-    )
+    lifecycleScope.launch {
+      genrePicker.adapter = ArrayAdapter(
+          requireContext(),
+          android.R.layout.simple_spinner_dropdown_item,
+          repository.getGenres().map { it.name }
+      )
+    }
 
     selectFilter.setOnClickListener { filterBooks() }
   }
 
-  private fun filterBooks() {
+  private fun filterBooks() = lifecycleScope.launch {
     val selectedGenre = repository.getGenres().firstOrNull { genre ->
       genre.name == genrePicker.selectedItem
     }?.id
@@ -83,11 +86,11 @@ class FilterPickerDialogFragment(private val onFilterSelected: (Filter?) -> Unit
     val rating = ratingPicker.rating.toInt()
 
     if (selectedGenre == null && filterOptions.checkedRadioButtonId == R.id.byGenreFilter) {
-      return
+      return@launch
     }
 
     if ((rating < 1 || rating > 5) && filterOptions.checkedRadioButtonId == R.id.byRatingFilter) {
-      return
+      return@launch
     }
 
     val filter = when (filterOptions.checkedRadioButtonId) {

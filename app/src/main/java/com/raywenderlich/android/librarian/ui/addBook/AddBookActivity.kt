@@ -40,12 +40,13 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.raywenderlich.android.librarian.App
 import com.raywenderlich.android.librarian.R
 import com.raywenderlich.android.librarian.model.Book
-import com.raywenderlich.android.librarian.model.Genre
 import com.raywenderlich.android.librarian.utils.toast
 import kotlinx.android.synthetic.main.activity_add_book.*
+import kotlinx.coroutines.launch
 
 class AddBookActivity : AppCompatActivity() {
 
@@ -64,14 +65,16 @@ class AddBookActivity : AppCompatActivity() {
   private fun initUi() {
     addBook.setOnClickListener { createBook() }
 
-    genrePicker.adapter = ArrayAdapter(
-        this@AddBookActivity,
-        android.R.layout.simple_spinner_dropdown_item,
-        repository.getGenres().map { it.name }
-    )
+    lifecycleScope.launch {
+      genrePicker.adapter = ArrayAdapter(
+          this@AddBookActivity,
+          android.R.layout.simple_spinner_dropdown_item,
+          repository.getGenres().map { it.name }
+      )
+    }
   }
 
-  private fun createBook() {
+  private fun createBook() = lifecycleScope.launch {
     val title = bookTitle.text.toString()
     val description = bookDescription.text.toString()
     val genreId = repository.getGenres().firstOrNull { it.name == genrePicker.selectedItem }?.id

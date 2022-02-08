@@ -38,6 +38,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.raywenderlich.android.librarian.App
@@ -47,8 +48,11 @@ import com.raywenderlich.android.librarian.model.relations.BookReview
 import com.raywenderlich.android.librarian.ui.bookReviewDetails.readingEntries.AddReadingEntryDialogFragment
 import com.raywenderlich.android.librarian.ui.bookReviewDetails.readingEntries.ReadingEntryAdapter
 import com.raywenderlich.android.librarian.utils.createAndShowDialog
+import com.raywenderlich.android.librarian.utils.formatDateToText
 import com.raywenderlich.android.librarian.utils.toast
 import kotlinx.android.synthetic.main.activity_book_review_details.*
+import kotlinx.coroutines.launch
+import java.util.*
 
 class BookReviewDetailsActivity : AppCompatActivity() {
 
@@ -93,22 +97,22 @@ class BookReviewDetailsActivity : AppCompatActivity() {
     displayData(reviewId)
   }
 
-  private fun displayData(reviewId: String) {
+  private fun displayData(reviewId: String) = lifecycleScope.launch {
     refreshData(reviewId)
-    val data = bookReview ?: return
+    val data = bookReview ?: return@launch
     val genre = repository.getGenreById(data.book.genreId)
 
-    Glide.with(this).load(data.review.imageUrl).into(bookImage)
+    Glide.with(this@BookReviewDetailsActivity).load(data.review.imageUrl).into(bookImage)
     reviewTitle.text = data.book.name
     reviewRating.rating = data.review.rating.toFloat()
     reviewDescription.text = data.review.notes
-//    lastUpdated.text = formatDateToText(data.review.lastUpdatedDate)
+    lastUpdated.text = formatDateToText(data.review.lastUpdatedDate)
     bookGenre.text = genre.name
 
-//    adapter.setData(data.review.entries)
+    adapter.setData(data.review.entries)
   }
 
-  private fun refreshData(id: String) {
+  private suspend fun refreshData(id: String) {
     val storedReview = repository.getReviewById(id)
 
     bookReview = storedReview
@@ -128,25 +132,28 @@ class BookReviewDetailsActivity : AppCompatActivity() {
   private fun addNewEntry(readingEntry: ReadingEntry) {
     val data = bookReview?.review ?: return
 
-//    val updatedReview = data.copy(entries = data.entries + readingEntry,
-//        lastUpdatedDate = Date())
+    val updatedReview = data.copy(entries = data.entries + readingEntry,
+        lastUpdatedDate = Date())
 
-    // TODO update review
-    toast("Entry added!")
+    lifecycleScope.launch {
+      repository.updateReview(updatedReview)
+      toast("Entry added!")
 
-    displayData(data.id)
+      displayData(data.id)
+    }
   }
 
   private fun removeReadingEntry(readingEntry: ReadingEntry) {
     val data = bookReview ?: return
     val currentReview = data.review
 
-//    val newReview = currentReview.copy(
-//        entries = currentReview.entries - readingEntry,
-//        lastUpdatedDate = Date()
-//    )
-    // TODO update review
-
-    loadData()
+    val newReview = currentReview.copy(
+        entries = currentReview.entries - readingEntry,
+        lastUpdatedDate = Date()
+    )
+    lifecycleScope.launch {
+      repository.updateReview(newReview)
+      loadData()
+    }
   }
 }

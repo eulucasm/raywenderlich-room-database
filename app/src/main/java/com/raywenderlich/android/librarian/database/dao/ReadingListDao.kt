@@ -34,17 +34,20 @@
 
 import androidx.room.*
 import com.raywenderlich.android.librarian.model.ReadingList
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ReadingListDao {
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
-  fun addReadingList(readingList: ReadingList)
-
+  suspend fun addReadingList(readingList: ReadingList)
 
   @Query("SELECT * FROM readinglist")
-  fun getReadingLists(): List<ReadingList>
+  suspend fun getReadingLists(): List<ReadingList>
+
+  @Query("SELECT * FROM readinglist")
+  fun getReadingListsFlow(): Flow<List<ReadingList>>
 
   @Delete
-  fun removeReadingList(readingList: ReadingList)
+  suspend fun removeReadingList(readingList: ReadingList)
 }

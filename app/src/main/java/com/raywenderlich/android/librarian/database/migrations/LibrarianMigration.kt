@@ -30,30 +30,19 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- */
+ */package com.raywenderlich.android.librarian.database.migrations
 
-package com.raywenderlich.android.librarian.model
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 
-import android.os.Parcelable
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import androidx.room.TypeConverters
-import com.raywenderlich.android.librarian.database.converters.DateConverter
-import com.raywenderlich.android.librarian.database.converters.ReadingEntryConverter
-import kotlinx.android.parcel.Parcelize
-import java.util.*
+val migration_1_2 = object : Migration(1, 2) {
+  override fun migrate(database: SupportSQLiteDatabase) {
+    database.execSQL("ALTER TABLE Review ADD COLUMN lastUpdatedDate INTEGER NOT NULL DEFAULT 0")
+  }
+}
 
-@Parcelize
-@Entity
-data class Review(
-    @PrimaryKey
-    val id: String = UUID.randomUUID().toString(),
-    val bookId: String,
-    val rating: Int,
-    val notes: String,
-    val imageUrl: String,
-    @TypeConverters(DateConverter::class)
-    val lastUpdatedDate: Date,
-    @TypeConverters(ReadingEntryConverter::class)
-    val entries: List<ReadingEntry>
-) : Parcelable
+val migration_2_3 = object : Migration(2, 3) {
+  override fun migrate(database: SupportSQLiteDatabase) {
+    database.execSQL("ALTER TABLE Review ADD COLUMN entries TEXT NOT NULL DEFAULT ''")
+  }
+}

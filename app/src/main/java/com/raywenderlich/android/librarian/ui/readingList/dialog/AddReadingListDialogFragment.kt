@@ -40,17 +40,19 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.lifecycleScope
 import com.raywenderlich.android.librarian.App
 import com.raywenderlich.android.librarian.R
 import com.raywenderlich.android.librarian.model.ReadingList
 import kotlinx.android.synthetic.main.dialog_add_reading_list.*
+import kotlinx.coroutines.launch
 
 class AddReadingListDialogFragment(private val onListAdded: () -> Unit) : DialogFragment() {
 
   private val repository by lazy { App.repository }
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-      savedInstanceState: Bundle?): View? {
+                            savedInstanceState: Bundle?): View? {
     return inflater.inflate(R.layout.dialog_add_reading_list, container, false)
   }
 
@@ -77,9 +79,11 @@ class AddReadingListDialogFragment(private val onListAdded: () -> Unit) : Dialog
     if (readingListName.isNotBlank()) {
       val readingList = ReadingList(name = readingListName)
 
-      repository.addReadingList(readingList)
-      onListAdded()
-      dismissAllowingStateLoss()
+      lifecycleScope.launch {
+        repository.addReadingList(readingList)
+        onListAdded()
+        dismissAllowingStateLoss()
+      }
     }
   }
 }
